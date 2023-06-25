@@ -34,7 +34,7 @@ app.include_router(
 current_user = fastapi_users.current_user()
 
 
-@app.post("/audio_cutter")
+@app.post("/audio_splitter")
 def upload(file: UploadFile = File(...)):
     contents = file.file.read()
     with open("modules/audio_modules/audios/" + file.filename, 'wb') as f:
