@@ -1,14 +1,13 @@
 from fastapi_users import FastAPIUsers
 
 from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import FileResponse
 
 from auth.auth import auth_backend
 from auth.database import User
 from auth.manager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 
-from modules.audio_modules.audio_word_cutter import audio_cutter
+from modules.audio_modules.audio_wordstamps import audio_to_text
 
 app = FastAPI(
     title="Follow My Reading App"
@@ -34,14 +33,12 @@ app.include_router(
 current_user = fastapi_users.current_user()
 
 
-@app.post("/audio_splitter")
-def upload(file: UploadFile = File(...)):
+@app.post("/audio_to_text")
+def audio_process(file: UploadFile = File(...)):
     contents = file.file.read()
     with open("modules/audio_modules/audios/" + file.filename, 'wb') as f:
         f.write(contents)
-    print(audio_cutter("modules/audio_modules/audios/" + file.filename))
-
-    return FileResponse(path="modules/audio_modules/audios/" + file.filename + ".zip", filename=file.filename+".zip")
+    return audio_to_text("modules/audio_modules/audios/" + file.filename)
 
 
 @app.get("/unprotected-route")
