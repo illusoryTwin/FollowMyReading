@@ -3,6 +3,15 @@ class AudioFileWithText:
         # Initialize class with audio file path
         self.audio_file_path = audio_file_path
 
+    @staticmethod
+    # Function to flatten a list of lists
+    def flat_map(fn, list_):
+        result = []
+        # Apply function to every item in list, extending the result list
+        for item in list_:
+            result.extend(fn(item))
+        return result
+
     def get_timed_recognised_text(self):
         '''
         Transcribes audio into text
@@ -11,7 +20,7 @@ class AudioFileWithText:
         '''
         # Load the whisper model
         model = whisper.load_model('small')
-        # Transcribe the audio file into words with timestamps
+        # Transcribe the audio file into words with timestamps. 16-bit floating point precision
         response = model.transcribe(self.audio_file_path, fp16=False, word_timestamps=True)
         response_dic = response["segments"]
 
@@ -27,7 +36,8 @@ class AudioFileWithText:
         # Obtain timed transcriptions
         timed_recognised_text = self.get_timed_recognised_text()
         mapping = []
-        # Map last words to their end times in the transcriptions
+
+        # For each 'last word', find matching transcriptions and store their end times
         for last_word in last_words:
             matching_transcriptions = []
             for transcription in timed_recognised_text:
@@ -41,6 +51,9 @@ class AudioFileWithText:
         return word_end_timestamps
 
     def split_audio_by_last_words(self, last_words):
+        """
+        Splits the audio file into segments based on the 'last words' of sentences.
+        """
         # Load audio file
         audio = AudioSegment.from_file(self.audio_file_path, format="mp3")
 
@@ -60,12 +73,3 @@ class AudioFileWithText:
             segment = audio[start_time:end_time]
             segments.append(segment)
         return segments
-
-
-# Function to flatten a list of lists
-def flat_map(fn, list_):
-    result = []
-    # Apply function to every item in list, extending the result list
-    for item in list_:
-        result.extend(fn(item))
-    return result
