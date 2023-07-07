@@ -1,3 +1,5 @@
+import os
+
 from fastapi_users import FastAPIUsers
 
 from fastapi import FastAPI, UploadFile, File
@@ -7,10 +9,11 @@ from auth.database import User
 from auth.manager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 
-from modules.audio_modules.audio_wordstamps import audio_to_text
+from modules.image_modules.ImageWithText import ImageWithText
+
 
 app = FastAPI(
-    title="Follow My Reading App"
+    title="Follow My Reading API"
 )
 
 fastapi_users = FastAPIUsers[User, int](
@@ -33,12 +36,15 @@ app.include_router(
 current_user = fastapi_users.current_user()
 
 
-@app.post("/audio_to_text")
-def audio_process(file: UploadFile = File(...)):
-    contents = file.file.read()
-    with open("modules/audio_modules/audios/" + file.filename, 'wb') as f:
-        f.write(contents)
-    return audio_to_text("modules/audio_modules/audios/" + file.filename)
+@app.post("/image_to_text")
+def audio_process(uploaded_file: UploadFile = File(...)):
+    uploaded_file_content = uploaded_file.file.read()
+    with open("modules/image_modules/images/" + uploaded_file.filename, 'wb') as f:
+        f.write(uploaded_file_content)
+    image = ImageWithText("modules/image_modules/images/" + uploaded_file.filename)
+    last_words_array = image.get_last_word_of_every_sentence()
+    os.remove("modules/image_modules/images/" + uploaded_file.filename)
+    return last_words_array
 
 
 @app.get("/unprotected-route")
