@@ -10,6 +10,7 @@ from auth.manager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 
 from modules.image_modules.ImageWithText import ImageWithText
+from modules.audio_modules.AudioFileWithText import AudioFileWithText
 
 
 app = FastAPI(
@@ -45,6 +46,17 @@ def audio_process(uploaded_file: UploadFile = File(...)):
     last_words_array = image.get_last_word_of_every_sentence()
     os.remove("modules/image_modules/images/" + uploaded_file.filename)
     return last_words_array
+
+
+@app.post("/audio_to_text")
+def audio_process(uploaded_file: UploadFile = File(...)):
+    uploaded_file_content = uploaded_file.file.read()
+    with open("modules/audio_modules/audios/" + uploaded_file.filename, 'wb') as f:
+        f.write(uploaded_file_content)
+    audio = AudioFileWithText("modules/audio_modules/audios/" + uploaded_file.filename)
+    words_dict = audio.get_timed_recognised_text()
+    os.remove("modules/audio_modules/audios/" + uploaded_file.filename)
+    return words_dict
 
 
 @app.get("/unprotected-route")
