@@ -5,7 +5,7 @@ from PIL import Image
 class ImageWithText:
     """Class for handling an image with text."""
 
-    def __init__(self, image: Image):
+    def __init__(self, image: str):
         """Initializes the class with an image."""
         self.image = image
 
