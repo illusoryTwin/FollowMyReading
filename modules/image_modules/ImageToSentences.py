@@ -41,7 +41,7 @@ class ImageWithText:
 
     def get_sentences(self):
         """
-        Extract text from the image and find the last word of each sentence.
+        Extract text from the image.
         Returns a string that represents the extracted text from the image.
         """
         # Extract text from the image
