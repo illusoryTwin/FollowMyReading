@@ -1,3 +1,5 @@
+import re
+
 class LastSentencesWords:
     """Class for retrieving last words from sentences in the text."""
 
@@ -6,45 +8,32 @@ class LastSentencesWords:
         self.string = string
 
     @staticmethod
-    def insert_space_before_punct_mark(text):
+    def get_sentences(text):
         """
-        Function to insert a space before each punctuation mark in the text.
+        Extract sentences from the text.
+        Returns a list of strings, where each string represents a sentence from the text.
         """
-        sentence_end_marks = ['.', ',', '?', '!']
-        for mark in sentence_end_marks:
-            text = text.replace(mark, f' {mark}')
-        return text
-
-    @staticmethod
-    def find_word_before_punct_mark(text):
-        """
-        Function to find the last word before each punctuation mark in the text.
-        """
-        words_array = text.split(" ")
-        last_words_array = []
-        sentence_end_marks = ['.', ',', '?', '!']
-
-        for word_index in range(len(words_array)):
-            if words_array[word_index] in sentence_end_marks:
-                if word_index > 0:
-                    word_before_mark = words_array[word_index - 1]
-                    last_words_array.append(word_before_mark)
-
-        return last_words_array
+        sentences = re.split('(?<=[.!?])', text)
+        return sentences
 
     def get_last_word_of_every_sentence(self):
         """
         Find the last word of each sentence in the text.
         """
+        sentences = self.get_sentences(self.string)
+        last_words = []
+        sentence_end_marks = ['.', '?', '!']
 
-        # Format the text by inserting a space before each punctuation mark
-        formatted_text = self.insert_space_before_punct_mark(self.string)
-
-        # Find the last word of each sentence
-        last_words = self.find_word_before_punct_mark(formatted_text)
+        for sentence in sentences:
+            words = sentence.split()
+            if words:
+                last_word = words[-1]
+                # Remove any trailing punctuation signs
+                while last_word and last_word[-1] in sentence_end_marks:
+                    last_word = last_word[:-1]
+                last_words.append(last_word)
 
         return last_words
-
 
 # # Instance 1 of LastSentencesWords
 # text = "Hello! How are you? I hope you're doing well."
@@ -56,7 +45,6 @@ class LastSentencesWords:
 # # Print the last words
 # for word in last_words:
 #     print(word)
-
 
 
 # # Instance 2 of LastSentencesWords
