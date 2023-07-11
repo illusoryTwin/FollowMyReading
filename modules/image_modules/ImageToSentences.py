@@ -29,7 +29,7 @@ class ImageWithText:
         """
         words_array = text.split(" ")
         last_words_array = []
-        sentence_end_marks = ['.', ',', '?', '!']
+        sentence_end_marks = ['.', '?', '!']
 
         for word_index in range(len(words_array)):
             if words_array[word_index] in sentence_end_marks:
