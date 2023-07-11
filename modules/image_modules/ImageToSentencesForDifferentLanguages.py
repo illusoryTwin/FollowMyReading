@@ -65,7 +65,7 @@ class ImageWithText:
         image_text = pytesseract.image_to_string(self.image, lang="rus")
 
         # # Split the text into sentences
-        sentences = re.split('(?<=[.!?]) +|\n', image_text)
+        sentences = re.split('(?<=[.!?])', image_text)
         return sentences
         return sentencees
 
