@@ -67,7 +67,6 @@ class ImageWithText:
         # # Split the text into sentences
         sentences = re.split('(?<=[.!?])', image_text)
         return sentences
-        return sentencees
 
 
 # # Example of usage
