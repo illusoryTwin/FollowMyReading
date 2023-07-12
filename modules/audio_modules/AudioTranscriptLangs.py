@@ -19,7 +19,7 @@ class AudioTranscriptLangs:
             result.extend(fn(item))
         return result
 
-    def get_timed_recognised_text(self, lang_code):
+    def get_transcription(self, lang_code):
         """
         Transcribes audio into text
         :parameter audio_name - name of input audio
