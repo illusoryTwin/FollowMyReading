@@ -1,6 +1,10 @@
 from pydub import AudioSegment
 
+
 def convert_to_mp3(input_file_path, output_file_path):
+    """
+    The function to convert an audio-file to the .mp3 format
+    """
     # Load the audio file
     audio = AudioSegment.from_file(input_file_path)
 
