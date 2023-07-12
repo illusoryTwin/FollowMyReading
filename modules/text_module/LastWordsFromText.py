@@ -3,9 +3,9 @@ import re
 class LastSentencesWords:
     """Class for retrieving last words from sentences in the text."""
 
-    def __init__(self, string: str):
-        """Initializes the class with a string."""
-        self.string = string
+    def __init__(self, string_list: list):
+        """Initializes the class with a list of strings."""
+        self.string_list = string_list
 
     @staticmethod
     def get_sentences(text):
@@ -20,20 +20,22 @@ class LastSentencesWords:
         """
         Find the last word of each sentence in the text.
         """
-        sentences = self.get_sentences(self.string)
         last_words = []
         sentence_end_marks = ['.', '?', '!']
 
-        for sentence in sentences:
-            words = sentence.split()
-            if words:
-                last_word = words[-1]
-                # Remove any trailing punctuation signs
-                while last_word and last_word[-1] in sentence_end_marks:
-                    last_word = last_word[:-1]
-                last_words.append(last_word)
+        for string in self.string_list:
+            sentences = self.get_sentences(string)
+            for sentence in sentences:
+                words = sentence.split()
+                if words:
+                    last_word = words[-1]
+                    # Remove any trailing punctuation signs
+                    while last_word and last_word[-1] in sentence_end_marks:
+                        last_word = last_word[:-1]
+                    last_words.append(last_word)
 
         return last_words
+
 
 # # Instance 1 of LastSentencesWords
 # text = "Hello! How are you? I hope you're doing well."
