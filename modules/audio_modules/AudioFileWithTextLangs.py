@@ -35,7 +35,7 @@ class AudioFileWithTextLangs:
         # Iterate over all segments, collecting all words in transcription
         for sentence in response_dic:
             for word in sentence['words']:
-                transcription.append(word)
+                transcription.append(word['word'])
 
         return transcription
 
