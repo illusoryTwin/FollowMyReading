@@ -17,26 +17,6 @@ from PIL import Image
 
 pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
 
-
-class LanguageChecker:
-    """Class to check the language and return specific results."""
-
-    def __init__(self, language: str):
-        """Initialize the class with a language."""
-        self.language = language.lower()
-
-    def get_lang_code(self):
-        """Return specific results based on the language."""
-        if self.language == 'english' or self.language == 'eng':
-            return 'eng'
-        elif self.language == 'russian' or self.language == 'rus':
-            return 'rus'
-        elif self.language == 'arabic' or self.language == 'ara':
-            return 'ara'
-        else:
-            return 'Unknown language'
-
-
 class ImageWithText:
     """Class for handling an image with text."""
 
