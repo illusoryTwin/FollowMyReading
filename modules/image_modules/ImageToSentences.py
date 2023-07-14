@@ -1,6 +1,3 @@
-# !apt install tesseract-ocr
-# !pip install pytesseract
-
 import pytesseract
 from PIL import Image
 
@@ -47,9 +44,3 @@ class ImageWithText:
         # Extract text from the image
         image_text = pytesseract.image_to_string(self.image)
         return image_text
-
-# # Example of usage
-# image = Image.open("часть 1.png")
-# image_with_text = ImageWithText(image)
-# sentences = image_with_text.get_sentences()
-# print(sentences)
