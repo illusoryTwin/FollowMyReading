@@ -40,15 +40,6 @@ app.include_router(
 current_user = fastapi_users.current_user()
 
 
-@app.post("/image_to_strings")
-def image_process(user: User = Depends(current_user), file: UploadFile = File(...)):
-    contents = file.file.read()
-    with open("app/modules/image_modules/uploaded_images/" + file.filename, 'wb') as f:
-        f.write(contents)
-    image_file = ImageWithText("app/modules/image_modules/uploaded_images/" + file.filename)
-    return image_file.get_last_word_of_every_sentence()
-
-
 # First file - audio, second file - image
 @app.post("/audio_split_by_image")
 def audio_split_by_image(background_tasks: BackgroundTasks,  user: User = Depends(current_user),
