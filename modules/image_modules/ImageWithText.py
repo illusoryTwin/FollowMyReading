@@ -1,5 +1,4 @@
 import pytesseract
-from PIL import Image
 
 
 class ImageWithText:
