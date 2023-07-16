@@ -16,7 +16,7 @@ class AudioFileWithText:
             result.extend(fn(item))
         return result
 
-    def get_timed_recognised_text(self):
+    def get_timed_recognised_text(self, lang_code):
         """
         Transcribes audio into text
         :parameter audio_name - name of input audio
@@ -25,7 +25,7 @@ class AudioFileWithText:
         # Load the whisper model
         model = whisper.load_model('small')
         # Transcribe the audio file into words with timestamps. 16-bit floating point precision
-        response = model.transcribe(self.audio_file_path, fp16=False, word_timestamps=True)
+        response = model.transcribe(self.audio_file_path, fp16=False, word_timestamps=True, language=lang_code)
         response_dic = response["segments"]
 
         transcription = []
@@ -36,9 +36,9 @@ class AudioFileWithText:
 
         return transcription
 
-    def get_end_time_of_each_sentence(self, last_words):
+    def get_end_time_of_each_sentence(self, last_words, lang_code: str):
         # Obtain timed transcriptions
-        timed_recognised_text = self.get_timed_recognised_text()
+        timed_recognised_text = self.get_timed_recognised_text(lang_code)
         mapping = []
 
         # For each 'last word', find matching transcriptions and store their end times
@@ -54,7 +54,7 @@ class AudioFileWithText:
         word_end_timestamps += self.flat_map(lambda lst: lst, mapping)
         return word_end_timestamps
 
-    def split_audio_by_last_words(self, last_words):
+    def split_audio_by_last_words(self, last_words, lang_code: str):
         """
         Splits the audio file into segments based on the 'last words' of sentences.
         """
@@ -63,7 +63,10 @@ class AudioFileWithText:
 
         segments = []
         # Obtain timestamps for all sentences' end times
-        timestamps = self.get_end_time_of_each_sentence(last_words)
+        timestamps = self.get_end_time_of_each_sentence(last_words, lang_code)
+        # No need to split by the very last word
+        timestamps = timestamps[:-1]
+        print("timestamps", timestamps)
         # Iterate over all timestamps, splitting audio into segments
         for timestamp_index, timestamp in enumerate(timestamps):
             start_time = int(timestamp * 1000)

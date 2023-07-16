@@ -19,3 +19,9 @@ class file_with_body(BaseModel):
 class orig_strings_and_transcription(str, Enum):
     true = "yes"
     false = "no"
+
+
+class Language(str, Enum):
+    ru = "russian"
+    ara = "arabic"
+    eng = "english"
