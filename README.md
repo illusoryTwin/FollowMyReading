@@ -89,7 +89,8 @@ $ cd <repository_directory>
 
 </div>
 
-You will need only app directory and requirements
+Note: you will need only app directory and requirements.
+
 Install frameworks required for correct work.
 
 

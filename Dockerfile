@@ -3,6 +3,9 @@ RUN apt-get update
 RUN apt-get install -y ffmpeg
 RUN apt-get install -y git
 RUN apt-get install -y tesseract-ocr
+RUN apt-get install -y tesseract-ocr tesseract-ocr-rus
+WORKDIR /usr/share/tesseract-ocr/5/tessdata/
+RUN wget https://github.com/tesseract-ocr/tessdata/raw/main/ara.traineddata
 WORKDIR /
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
