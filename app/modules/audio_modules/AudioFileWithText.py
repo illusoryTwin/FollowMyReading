@@ -1,3 +1,7 @@
+import whisper
+from pydub import AudioSegment
+
+
 class AudioFileWithText:
     def __init__(self, audio_file_path: str):
         # Initialize class with audio file path
@@ -13,11 +17,11 @@ class AudioFileWithText:
         return result
 
     def get_timed_recognised_text(self):
-        '''
+        """
         Transcribes audio into text
         :parameter audio_name - name of input audio
         :return transcription - the transcribed text
-        '''
+        """
         # Load the whisper model
         model = whisper.load_model('small')
         # Transcribe the audio file into words with timestamps. 16-bit floating point precision
@@ -47,7 +51,7 @@ class AudioFileWithText:
 
         # Create list of end times for all words in mapping
         word_end_timestamps = [0]
-        word_end_timestamps += flat_map(lambda lst: lst, mapping)
+        word_end_timestamps += self.flat_map(lambda lst: lst, mapping)
         return word_end_timestamps
 
     def split_audio_by_last_words(self, last_words):

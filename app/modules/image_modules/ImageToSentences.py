@@ -26,7 +26,7 @@ class ImageWithText:
         """
         words_array = text.split(" ")
         last_words_array = []
-        sentence_end_marks = ['.', ',', '?', '!']
+        sentence_end_marks = ['.', '?', '!']
 
         for word_index in range(len(words_array)):
             if words_array[word_index] in sentence_end_marks:
@@ -36,17 +36,11 @@ class ImageWithText:
 
         return last_words_array
 
-    def get_last_word_of_every_sentence(self):
+    def get_sentences(self):
         """
-        Extract text from the image and find the last word of each sentence.
+        Extract text from the image.
+        Returns a string that represents the extracted text from the image.
         """
         # Extract text from the image
         image_text = pytesseract.image_to_string(self.image)
-
-        # Format the text by inserting a space before each punctuation mark
-        formatted_text = self.insert_space_before_punct_mark(image_text)
-
-        # Find the last word of each sentence
-        last_words = self.find_word_before_punct_mark(formatted_text)
-
-        return last_words
+        return image_text
