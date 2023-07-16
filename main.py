@@ -13,11 +13,12 @@ from auth.database import User
 from auth.manager import get_user_manager
 from auth.schemas import UserRead, UserCreate
 from modules.archive_modules.zip_archiver import zip_add_file
+from modules.audio_modules.AudioToTranscription import AudioFileWithText as AudioFileWithTextTranscription
 from modules.audio_modules.AudioFileWithText import AudioFileWithText
 from modules.image_modules.ImageWithText import ImageWithText
 from modules.image_modules.ImageToSentences import ImageWithText as ImageWithTextSentences
 from modules.text_module.LastWordsFromText import LastSentencesWords
-from schemas.main_schema import sentences_list
+from schemas.main_schema import sentences_list, file_with_body, orig_strings_and_transcription
 
 app = FastAPI(
     title="Follow My Reading App"
@@ -44,7 +45,8 @@ current_user = fastapi_users.current_user()
 
 
 @app.post("/image_to_strings")
-def image_to_string(background_tasks: BackgroundTasks, user: User = Depends(current_user), file: UploadFile = File(...)):
+def image_to_string(background_tasks: BackgroundTasks, user: User = Depends(current_user),
+                    file: UploadFile = File(...)):
     contents = file.file.read()
     with open("modules/image_modules/images/" + file.filename, 'wb') as f:
         f.write(contents)
@@ -54,8 +56,9 @@ def image_to_string(background_tasks: BackgroundTasks, user: User = Depends(curr
 
 
 @app.post("/audio_split_by_strings")
-def audio_split_by_strings(background_tasks: BackgroundTasks, user: User = Depends(current_user),
-                           string_with_sentences: sentences_list = Depends(), file: UploadFile = File(...)):
+def audio_split_by_strings(background_tasks: BackgroundTasks, transcription: orig_strings_and_transcription,
+                           user: User = Depends(current_user), string_with_sentences: sentences_list = Depends(),
+                           file: UploadFile = File(...)):
     contents = file.file.read()
     with open("modules/audio_modules/audios/" + file.filename, 'wb') as f:
         f.write(contents)
@@ -70,6 +73,11 @@ def audio_split_by_strings(background_tasks: BackgroundTasks, user: User = Depen
         zip_add_file(zip_file_name, output_file)
     background_tasks.add_task(shutil.rmtree, "modules/audio_modules/audios/" + file.filename[:-4])
     background_tasks.add_task(os.remove, "modules/audio_modules/audios/" + file.filename)
+    if transcription.value == "yes":
+        audio_transcription_file = AudioFileWithTextTranscription("modules/audio_modules/audios/" + file.filename)
+        audio_transcription = audio_transcription_file.get_timed_recognised_text()
+        return file_with_body(file=FileResponse(path=zip_file_name, filename=file.filename[:-4] + ".zip"),
+                              original_strings=string_with_sentences.sentences, audio_transcription=audio_transcription)
     return FileResponse(path=zip_file_name, filename=file.filename[:-4] + ".zip")
 
 
