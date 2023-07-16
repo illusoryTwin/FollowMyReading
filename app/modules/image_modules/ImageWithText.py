@@ -22,7 +22,7 @@ class ImageFileWithText:
         # Extract text from the image
         image_text = pytesseract.image_to_string(self.image, lang=lang_code)
 
-        if not signs:
+        if not signs or signs == ['']:
             signs = r'[.!?]'
         else:
             # Escape special characters in the provided signs, including comma
