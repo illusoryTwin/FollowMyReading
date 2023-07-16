@@ -15,6 +15,8 @@ from auth.schemas import UserRead, UserCreate
 from modules.archive_modules.zip_archiver import zip_add_file
 from modules.audio_modules.AudioFileWithText import AudioFileWithText
 from modules.image_modules.ImageWithText import ImageWithText
+from modules.image_modules.ImageToSentences import ImageWithText as ImageWithTextSentences
+
 
 app = FastAPI(
     title="Follow My Reading App"
@@ -41,12 +43,13 @@ current_user = fastapi_users.current_user()
 
 
 @app.post("/image_to_strings")
-def image_process(user: User = Depends(current_user), file: UploadFile = File(...)):
+def image_process(background_tasks: BackgroundTasks, user: User = Depends(current_user), file: UploadFile = File(...)):
     contents = file.file.read()
-    with open("app/modules/image_modules/uploaded_images/" + file.filename, 'wb') as f:
+    with open("modules/image_modules/images/" + file.filename, 'wb') as f:
         f.write(contents)
-    image_file = ImageWithText("app/modules/image_modules/uploaded_images/" + file.filename)
-    return image_file.get_last_word_of_every_sentence()
+    image_file = ImageWithTextSentences("modules/image_modules/images/" + file.filename)
+    background_tasks.add_task(os.remove, "modules/image_modules/images/" + file.filename)
+    return image_file.get_sentences()
 
 
 # First file - audio, second file - image
