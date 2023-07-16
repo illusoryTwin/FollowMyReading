@@ -6,7 +6,6 @@ import whisper
 from pydub import AudioSegment
 
 
-
 class AudioFileWithTextLangs:
     def __init__(self, audio_file_path: str):
         # Initialize class with audio file path
@@ -42,25 +41,24 @@ class AudioFileWithTextLangs:
         return transcription
 
     def get_words_from_audio(self, lang_code):
-            """
-            Transcribes audio into text
-            :parameter audio_name - name of input audio
-            :return words - a list of transcribed words
-            """
-            # Load the whisper model
-            model = whisper.load_model('small')
-            # Transcribe the audio file into words with timestamps. 16-bit floating point precision
-            response = model.transcribe(self.audio_file_path, fp16=False, word_timestamps=True, language=lang_code)
-            response_dic = response["segments"]
+        """
+        Transcribes audio into text
+        :parameter audio_name - name of input audio
+        :return words - a list of transcribed words
+        """
+        # Load the whisper model
+        model = whisper.load_model('small')
+        # Transcribe the audio file into words with timestamps. 16-bit floating point precision
+        response = model.transcribe(self.audio_file_path, fp16=False, word_timestamps=True, language=lang_code)
+        response_dic = response["segments"]
 
-            words = []
-            # Iterate over all segments, collecting all words in transcription
-            for sentence in response_dic:
-                for word in sentence['words']:
-                    words.append(word['word'])
+        words = []
+        # Iterate over all segments, collecting all words in transcription
+        for sentence in response_dic:
+            for word in sentence['words']:
+                words.append(word['word'])
 
-            return words
-
+        return words
 
     def get_end_time_of_each_sentence(self, last_words, lang_code: str):
         # Obtain timed transcriptions
@@ -71,8 +69,8 @@ class AudioFileWithTextLangs:
         for last_word in last_words:
             matching_transcriptions = []
             for transcription in timed_recognised_text:
-                #print(last_word)
-                #print("transcription", transcription)
+                # print(last_word)
+                # print("transcription", transcription)
                 if last_word in transcription['word']:
                     matching_transcriptions.append(transcription['end'])
             mapping.append(matching_transcriptions)
@@ -108,4 +106,3 @@ class AudioFileWithTextLangs:
             segment = audio[start_time:end_time]
             segments.append(segment)
         return segments
-
