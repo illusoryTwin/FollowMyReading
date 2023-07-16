@@ -7,6 +7,7 @@ from pydub import AudioSegment
 
 
 class AudioFileWithTextLangs:
+
     def __init__(self, audio_file_path: str):
         # Initialize class with audio file path
         self.audio_file_path = audio_file_path
