@@ -50,8 +50,8 @@ complete_audio_path = "app/modules/audio_modules/complete_audios/"
 
 
 @app.post("/image_to_strings")
-def image_to_string(input_signs: Annotated[list[str], Query()], language_name: Language,
-                    background_tasks: BackgroundTasks, user: User = Depends(current_user),
+def image_to_string(language_name: Language, background_tasks: BackgroundTasks,
+                    input_signs: Annotated[list[str], Query()] | None = None, user: User = Depends(current_user),
                     file: UploadFile = File(...)):
     lang_checker = LanguageChecker(language_name.value)
     lang_code = lang_checker.get_lang_code()
@@ -102,8 +102,8 @@ def audio_split_by_strings(list_with_sentences: Annotated[list[str], Query()], l
 
 # First file - audio, second file - image
 @app.post("/audio_split_by_image")
-def audio_split_by_image(list_with_sentences: Annotated[list[str], Query()], language_name: Language,
-                         background_tasks: BackgroundTasks, user: User = Depends(current_user),
+def audio_split_by_image(language_name: Language, background_tasks: BackgroundTasks,
+                         input_signs: Annotated[list[str], Query()] | None = None, user: User = Depends(current_user),
                          audio_file: UploadFile = File(...), image_file: UploadFile = File(...)):
     lang_checker = LanguageChecker(language_name.value)
     audio_lang_code = lang_checker.get_lang_code(for_audio=True)
@@ -114,7 +114,7 @@ def audio_split_by_image(list_with_sentences: Annotated[list[str], Query()], lan
     converted_image_name = name_without_extension(image_file.filename) + ".JPEG"
     convert_to_jpg(upload_image_path + image_file.filename, upload_image_path + converted_image_name)
     image_obj = ImageFileWithText(upload_image_path + converted_image_name)
-    sentences_from_image = image_obj.get_sentences(image_lang_code, list_with_sentences)
+    sentences_from_image = image_obj.get_sentences(image_lang_code, input_signs)
     last_words_from_image = LastSentencesWords(sentences_from_image).get_last_word_of_every_sentence()
     audio_contents = audio_file.file.read()
     with open(upload_audio_path + audio_file.filename, 'wb') as f:
