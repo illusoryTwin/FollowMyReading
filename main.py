@@ -16,7 +16,8 @@ from modules.archive_modules.zip_archiver import zip_add_file
 from modules.audio_modules.AudioFileWithText import AudioFileWithText
 from modules.image_modules.ImageWithText import ImageWithText
 from modules.image_modules.ImageToSentences import ImageWithText as ImageWithTextSentences
-
+from modules.text_module.LastWordsFromText import LastSentencesWords
+from schemas.main_schema import sentences_list
 
 app = FastAPI(
     title="Follow My Reading App"
@@ -43,13 +44,33 @@ current_user = fastapi_users.current_user()
 
 
 @app.post("/image_to_strings")
-def image_process(background_tasks: BackgroundTasks, user: User = Depends(current_user), file: UploadFile = File(...)):
+def image_to_string(background_tasks: BackgroundTasks, user: User = Depends(current_user), file: UploadFile = File(...)):
     contents = file.file.read()
     with open("modules/image_modules/images/" + file.filename, 'wb') as f:
         f.write(contents)
     image_file = ImageWithTextSentences("modules/image_modules/images/" + file.filename)
     background_tasks.add_task(os.remove, "modules/image_modules/images/" + file.filename)
     return image_file.get_sentences()
+
+
+@app.post("/audio_split_by_strings")
+def audio_split_by_strings(background_tasks: BackgroundTasks, user: User = Depends(current_user),
+                           string_with_sentences: sentences_list = Depends(), file: UploadFile = File(...)):
+    contents = file.file.read()
+    with open("modules/audio_modules/audios/" + file.filename, 'wb') as f:
+        f.write(contents)
+    last_words = LastSentencesWords(string_with_sentences.sentences).get_last_word_of_every_sentence()
+    audio_file = AudioFileWithText("modules/audio_modules/audios/" + file.filename)
+    audio_segments = audio_file.split_audio_by_last_words(last_words)
+    zip_file_name = "modules/audio_modules/audios/" + file.filename[:-4] + "/" + file.filename + ".zip"
+    os.mkdir("modules/audio_modules/audios/" + file.filename[:-4])
+    for num_of_seg, segment in enumerate(audio_segments):
+        output_file = "modules/audio_modules/audios/" + file.filename[:-4] + f"/audio_chunk_{num_of_seg}.mp3"
+        segment.export(output_file, format="mp3")
+        zip_add_file(zip_file_name, output_file)
+    background_tasks.add_task(shutil.rmtree, "modules/audio_modules/audios/" + file.filename[:-4])
+    background_tasks.add_task(os.remove, "modules/audio_modules/audios/" + file.filename)
+    return FileResponse(path=zip_file_name, filename=file.filename[:-4] + ".zip")
 
 
 # First file - audio, second file - image

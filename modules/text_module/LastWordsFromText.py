@@ -1,5 +1,6 @@
 import re
 
+
 class LastSentencesWords:
     """Class for retrieving last words from sentences in the text."""
 
@@ -35,26 +36,3 @@ class LastSentencesWords:
                     last_words.append(last_word)
 
         return last_words
-
-
-# # Instance 1 of LastSentencesWords
-# text = "Hello! How are you? I hope you're doing well."
-# ls_words = LastSentencesWords(text)
-#
-# # Retrieve the last words of each sentence
-# last_words = ls_words.get_last_word_of_every_sentence()
-#
-# # Print the last words
-# for word in last_words:
-#     print(word)
-
-
-# # Instance 2 of LastSentencesWords
-# text = "Hello! How are you? I hope you're doing well."
-# ls_words = LastSentencesWords(text)
-
-# # Retrieve the last words of each sentence
-# formatted_text = ls_words.insert_space_before_punct_mark(text)
-
-# # Print the formatted text
-# print(formatted_text)
