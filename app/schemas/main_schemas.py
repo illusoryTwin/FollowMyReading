@@ -3,10 +3,6 @@ from pydantic import BaseModel, Field
 from fastapi.responses import FileResponse
 
 
-class sentences_list(BaseModel):
-    sentences: list = Field(examples=[["Hello!", "My name is John."]])
-
-
 class file_with_body(BaseModel):
     file: FileResponse
     original_strings: list
