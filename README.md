@@ -43,36 +43,81 @@ Make sure to include the necessary parameters and data in your POST requests acc
 
 - **JWT Authentication**: Secure your API access using JSON Web Tokens (JWT). The API includes authentication endpoints for user registration, login, and logout, ensuring the protection of user data and access control.
 
-## Installation
+## Installation using Docker
 
-Firstly, install frameworks required for correct work.
+To run this application using Docker, follow the steps below:
+
+1. Clone the repository:
+
+<div class="termy">
+
+```bash
+$ git clone <repository_url>
+$ cd <repository_directory>
+```
+
+</div>
+
+2. Build and run the Docker containers using docker-compose:
+
+Use -d option for detached mode.
+
+```bash
+$ docker-compose up
+```
+The FastAPI application will be accessible at http://0.0.0.0:8000.
+
+Note: Make sure Docker and docker-compose are installed and running on your system before executing the above commands.
+3. Fill the role table
+For authorization to work correctly you need to fill the role table with at least 1 role, to choose it, during registration
+
+
+
+   
+## Clean installation
+
+To run this application on your machine without docker containers:
+
+Clone the repository:
+
+<div class="termy">
+
+```bash
+$ git clone <repository_url>
+$ cd <repository_directory>
+```
+
+</div>
+
+You will need only app directory and requirements
+Install frameworks required for correct work.
 
 
 <div class="termy">
 
 Install a multimedia framework for handling audio processing:
 
-```console
+```bash
 $ apt-get install -y ffmpeg
 ```
 
 Install the tesseract-ocr package for character recognition:
-```console
+```bash
 $ apt-get install -y tesseract-ocr
 ```
 
 Install an additional package for Tesseract OCR specifically for Russian language support:
-```console
+```bash
 $ apt-get install -y tesseract-ocr tesseract-ocr-rus
 ```
 
 Download a file that contains language data used by Tesseract OCR for Arabic language text recognition:
-```console
+```bash
 $ wget https://github.com/tesseract-ocr/tessdata/raw/main/ara.traineddata
 ```
 
 Move the downloaded "ara.traineddata" file to the appropriate directory:
-```console
+```bash
 $ mv ara.traineddata /usr/share/tesseract-ocr/5/tessdata/
 ```
 
@@ -83,7 +128,7 @@ Secondly, install python requirements:
 
 <div class="termy">
 
-```console
+```bash
 $ pip install --no-cache-dir --upgrade -r /app/requirements.txt
 ```
 
@@ -104,7 +149,7 @@ To initialize migrations you need to make an alembic revision:
 
 <div class="termy">
 
-```console
+```bash
 $ alembic revision --autogenerate -m 'name_of_revision'
 ```
 
@@ -114,7 +159,7 @@ And upgrade head after revision:
 
 <div class="termy">
 
-```console
+```bash
 $ alembic upgrade head
 ```
 
@@ -126,7 +171,7 @@ $ alembic upgrade head
 Run the server with:
 <div class="termy">
 
-```console
+```bash
 $ uvicorn main:app --host localhost --port 8000 --log-level 'trace'
 ```
 
