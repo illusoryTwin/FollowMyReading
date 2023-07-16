@@ -42,12 +42,15 @@ nvidia-cusparse-cu11==11.7.4.91
 nvidia-nccl-cu11==2.14.3
 nvidia-nvtx-cu11==11.7.91
 openai-whisper @ git+https://github.com/openai/whisper.git@248b6cb124225dd263bb9bd32d060b6517e067f8
+packaging==23.1
 passlib==1.7.4
+Pillow==10.0.0
 psycopg2-binary==2.9.6
 pycparser==2.21
 pydantic==1.10.9
 pydub==0.25.1
 PyJWT==2.6.0
+pytesseract==0.3.10
 python-dotenv==1.0.0
 python-multipart==0.0.6
 PyYAML==6.0
