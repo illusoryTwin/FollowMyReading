@@ -5,14 +5,14 @@ from typing import Annotated
 from fastapi_users import FastAPIUsers
 
 from fastapi import FastAPI, UploadFile, File, Depends, Query
-from fastapi.responses import FileResponse
 from starlette.background import BackgroundTasks
 
 from app.auth.auth import auth_backend
 from app.auth.database import User
 from app.auth.manager import get_user_manager
 from app.auth.schemas import UserRead, UserCreate
-from app.modules.archive_modules.zip_archiver import zip_add_file
+from app.modules.file_modules.firebase import firebase_upload_file
+from app.modules.file_modules.zip_archiver import zip_add_file
 from app.modules.audio_modules.AudioConverter import convert_to_mp3, name_without_extension
 from app.modules.audio_modules.AudioWithText import AudioFileWithText
 from app.modules.image_modules.ImageConverter import convert_to_jpg
@@ -108,15 +108,15 @@ def audio_split_by_strings(list_with_sentences: Annotated[list[str], Query()], l
         zip_add_file(zip_file_name, audio_chunk)
     background_tasks.add_task(shutil.rmtree, complete_audio_path + name_without_extension(converted_audio_name))
     background_tasks.add_task(os.remove, upload_audio_path + converted_audio_name)
+    firebase_link_to_file = firebase_upload_file(zip_file_name)
     if file.filename != converted_audio_name:
         background_tasks.add_task(os.remove, upload_audio_path + file.filename)
     if include_transcription.value == "yes":
         audio_transcription_file = AudioFileWithText(upload_audio_path + converted_audio_name)
         audio_transcription = audio_transcription_file.get_transcription(lang_code)
-        return file_with_body(file=FileResponse(path=zip_file_name,
-                                                filename=name_without_extension(converted_audio_name) + ".zip"),
-                              original_strings=list_with_sentences, audio_transcription=audio_transcription)
-    return FileResponse(path=zip_file_name, filename=name_without_extension(converted_audio_name) + ".zip")
+        return {"file_link": firebase_link_to_file, "original_strings": list_with_sentences,
+                "audio_transcription": audio_transcription}
+    return firebase_link_to_file
 
 
 # First file - audio, second file - image
@@ -153,11 +153,12 @@ def audio_split_by_image(language_name: Language, background_tasks: BackgroundTa
     background_tasks.add_task(shutil.rmtree, complete_audio_path + name_without_extension(converted_audio_name))
     background_tasks.add_task(os.remove, upload_audio_path + converted_audio_name)
     background_tasks.add_task(os.remove, upload_image_path + converted_image_name)
+    firebase_link_to_file = firebase_upload_file(zip_file_name)
     if audio_file.filename != converted_audio_name:
         background_tasks.add_task(os.remove, upload_audio_path + audio_file.filename)
     if image_file.filename != converted_image_name:
         background_tasks.add_task(os.remove, upload_image_path + image_file.filename)
-    return FileResponse(path=zip_file_name, filename=name_without_extension(converted_audio_name) + ".zip")
+    return firebase_link_to_file
 
 
 @app.get("/unprotected-route")

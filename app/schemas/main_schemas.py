@@ -4,7 +4,7 @@ from fastapi.responses import FileResponse
 
 
 class file_with_body(BaseModel):
-    file: FileResponse
+    file: str
     original_strings: list
     audio_transcription: list
 
