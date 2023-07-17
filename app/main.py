@@ -49,10 +49,10 @@ upload_audio_path = "app/modules/audio_modules/uploaded_audios/"
 complete_audio_path = "app/modules/audio_modules/complete_audios/"
 
 
-@app.post("/image_to_strings")
-def image_to_string(language_name: Language, background_tasks: BackgroundTasks,
-                    input_signs: Annotated[list[str], Query()] | None = None, user: User = Depends(current_user),
-                    file: UploadFile = File(...)):
+@app.post("/image_to_text")
+def image_to_text(language_name: Language, background_tasks: BackgroundTasks,
+                  input_signs: Annotated[list[str], Query()] | None = None, user: User = Depends(current_user),
+                  file: UploadFile = File(...)):
     lang_checker = LanguageChecker(language_name.value)
     lang_code = lang_checker.get_lang_code()
     contents = file.file.read()
@@ -62,8 +62,26 @@ def image_to_string(language_name: Language, background_tasks: BackgroundTasks,
     convert_to_jpg(upload_image_path + file.filename, upload_image_path + converted_image_name)
     image_file = ImageFileWithText(upload_image_path + converted_image_name)
     background_tasks.add_task(os.remove, upload_image_path + file.filename)
-    background_tasks.add_task(os.remove, upload_image_path + converted_image_name)
+    if file.filename != converted_image_name:
+        background_tasks.add_task(os.remove, upload_image_path + converted_image_name)
     return image_file.get_sentences(lang_code, input_signs)
+
+
+@app.post("/audio_to_text")
+def image_to_text(language_name: Language, background_tasks: BackgroundTasks, user: User = Depends(current_user),
+                  file: UploadFile = File(...)):
+    lang_checker = LanguageChecker(language_name.value)
+    lang_code = lang_checker.get_lang_code(for_audio=True)
+    contents = file.file.read()
+    with open(upload_audio_path + file.filename, 'wb') as f:
+        f.write(contents)
+    converted_audio_name = name_without_extension(file.filename) + ".mp3"
+    convert_to_mp3(upload_audio_path + file.filename, upload_audio_path + converted_audio_name)
+    audio_transcription_file = AudioFileWithText(upload_audio_path + converted_audio_name)
+    background_tasks.add_task(os.remove, upload_audio_path + converted_audio_name)
+    if file.filename != converted_audio_name:
+        background_tasks.add_task(os.remove, upload_audio_path + file.filename)
+    return audio_transcription_file.get_transcription(lang_code)
 
 
 @app.post("/audio_split_by_strings")
@@ -90,7 +108,8 @@ def audio_split_by_strings(list_with_sentences: Annotated[list[str], Query()], l
         zip_add_file(zip_file_name, audio_chunk)
     background_tasks.add_task(shutil.rmtree, complete_audio_path + name_without_extension(converted_audio_name))
     background_tasks.add_task(os.remove, upload_audio_path + converted_audio_name)
-    background_tasks.add_task(os.remove, upload_audio_path + file.filename)
+    if file.filename != converted_audio_name:
+        background_tasks.add_task(os.remove, upload_audio_path + file.filename)
     if include_transcription.value == "yes":
         audio_transcription_file = AudioFileWithText(upload_audio_path + converted_audio_name)
         audio_transcription = audio_transcription_file.get_transcription(lang_code)
@@ -134,8 +153,10 @@ def audio_split_by_image(language_name: Language, background_tasks: BackgroundTa
     background_tasks.add_task(shutil.rmtree, complete_audio_path + name_without_extension(converted_audio_name))
     background_tasks.add_task(os.remove, upload_audio_path + converted_audio_name)
     background_tasks.add_task(os.remove, upload_image_path + converted_image_name)
-    background_tasks.add_task(os.remove, upload_audio_path + audio_file.filename)
-    background_tasks.add_task(os.remove, upload_image_path + image_file.filename)
+    if audio_file.filename != converted_audio_name:
+        background_tasks.add_task(os.remove, upload_audio_path + audio_file.filename)
+    if image_file.filename != converted_image_name:
+        background_tasks.add_task(os.remove, upload_image_path + image_file.filename)
     return FileResponse(path=zip_file_name, filename=name_without_extension(converted_audio_name) + ".zip")
 
 
