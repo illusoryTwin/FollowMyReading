@@ -97,6 +97,6 @@ class AudioFileWithText:
         # Iterate over all segments, collecting all words in transcription
         for sentence in response_dic:
             for word in sentence['words']:
-                transcription.append(word['word'])
+                transcription.append(word['word'].strip())
 
         return transcription
